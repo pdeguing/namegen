@@ -1,4 +1,7 @@
-package main
+/*
+Package namegen implements a simple library to generate random names.
+*/
+package namegen
 
 import (
 	"fmt"
@@ -7,6 +10,9 @@ import (
 )
 
 func isVowel(c byte) bool {
+	if c <= 0 {
+		return false
+	}
 	return strings.Contains("aeiouy", string(c))
 }
 
@@ -26,30 +32,29 @@ func getConsonant(r *rand.Rand) byte {
 	return consonant[index]
 }
 
-func generate(r *rand.Rand, length int) (string, error) {
-
-	if (length <= 0) {
+func Name(r *rand.Rand, length int) (string, error) {
+	if length <= 0 {
 		return "", nil
 	}
 	buffer := make([]byte, length)
 	if r.Intn(9) < 4 {
-		buffer[0]= getVowel(r)
+		buffer[0] = getVowel(r)
 	} else {
 		buffer[0] = getConsonant(r)
 	}
 	for i := 1; i < length; i++ {
 		if i > 1 {
-			if isVowel(buffer[i - 1]) && isVowel(buffer[i - 2]) {
+			if isVowel(buffer[i-1]) && isVowel(buffer[i-2]) {
 				buffer[i] = getConsonant(r)
 				continue
 			}
-			if isConsonant(buffer[i - 1]) && isConsonant(buffer[i - 2]) {
+			if isConsonant(buffer[i-1]) && isConsonant(buffer[i-2]) {
 				buffer[i] = getVowel(r)
 				continue
 			}
 		}
 		if r.Intn(9) < 4 {
-			buffer[i]= getVowel(r)
+			buffer[i] = getVowel(r)
 		} else {
 			buffer[i] = getConsonant(r)
 		}
@@ -58,15 +63,23 @@ func generate(r *rand.Rand, length int) (string, error) {
 	return generated, nil
 }
 
+func Nname(r *rand.Rand, min_length, max_length, n int) ([]string, error) {
+	var length int
+	var names	[]string
+	var generated	string
+
+	for i := 0; i < n; i++ {
+		length = r.Intn(max_length-min_length) + min_length
+		generated, _ = Name(r, length)
+		names = append(names, generated)
+	}
+	return names, nil
+}
+
 func main() {
 	r := rand.New(rand.NewSource(42))
 	min_length := 3
 	max_length := 9
-	var length int
-	var generated_name string
-	for i := 0; i < 50; i++ {
-		length = r.Intn(max_length - min_length) + min_length
-		generated_name, _ = generate(r, length)
-		fmt.Println(strings.Title(generated_name))
-	}
+	names, _ := Nname(r, min_length, max_length, 50)
+	fmt.Println(names)
 }

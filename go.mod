@@ -1,3 +1,3 @@
-module github.com/pdeguing/true-random-name-generator
+module github.com/pdeguing/namegen
 
 go 1.13
